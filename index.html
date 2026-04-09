@@ -94,19 +94,19 @@
 </head>
 <body>
   <div class="container">
-    <h1>Meine Rezept-App 🍝</h1>
+    <h1>Things to cook</h1>
 
     <div class="card">
-      <h2>Neues Rezept</h2>
-      <input type="text" id="name" placeholder="Name des Rezepts" />
-      <input type="text" id="tags" placeholder="Tags, z. B. Kartoffel, Pasta, schnell" />
-      <textarea id="ingredients" placeholder="Zutaten"></textarea>
-      <textarea id="instructions" placeholder="Zubereitung"></textarea>
-      <button onclick="saveRecipe()">Rezept speichern</button>
+      <h2>New recipes</h2>
+      <input type="text" id="name" placeholder="Name" />
+      <input type="text" id="tags" placeholder="Tags" />
+      <textarea id="ingredients" placeholder="What do you need"></textarea>
+      <textarea id="instructions" placeholder="how to do"></textarea>
+      <button onclick="saveRecipe()">SAVE</button>
     </div>
 
     <div class="card">
-      <h2>Suche</h2>
+      <h2>Search</h2>
       <input type="text" id="search" placeholder="z. B. Kartoffel" oninput="renderRecipes()" />
     </div>
 
