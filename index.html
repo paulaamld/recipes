@@ -227,11 +227,17 @@ const searchIngredients = document.getElementById("searchIngredients").value.toL
 
       list.innerHTML = "";
 
-      const filteredRecipes = recipes.filter(recipe =>
-  (recipe.title || "").toLowerCase().includes(searchTitle) &&
-  (recipe.tags || "").toLowerCase().includes(searchTags) &&
-  (recipe.ingredients || "").toLowerCase().includes(searchIngredients)
-);
+const filteredRecipes = recipes.filter(recipe => {
+  const titleMatch = (recipe.title || "").toLowerCase().includes(searchTitle);
+  const ingredientsMatch = (recipe.ingredients || "").toLowerCase().includes(searchIngredients);
+
+  const recipeTags = (recipe.tags || "").toLowerCase().split(",").map(t => t.trim());
+  const searchTagsArray = searchTags.split(",").map(t => t.trim()).filter(t => t);
+
+  const tagsMatch = searchTagsArray.length === 0 || searchTagsArray.every(tag => recipeTags.includes(tag));
+
+  return titleMatch && ingredientsMatch && tagsMatch;
+});
 
       if (filteredRecipes.length === 0) {
         list.innerHTML = "<p>Keine Rezepte gefunden.</p>";
