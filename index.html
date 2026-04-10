@@ -127,7 +127,9 @@ a {
 
     <div class="card">
       <h2>Search</h2>
-      <input type="text" id="search" placeholder="Tags" oninput="renderRecipes()" />
+      <input type="text" id="searchTitle" placeholder="Titel suchen..." oninput="renderRecipes()" />
+<input type="text" id="searchTags" placeholder="Tags suchen..." oninput="renderRecipes()" />
+<input type="text" id="searchIngredients" placeholder="Zutaten suchen..." oninput="renderRecipes()" />
     </div>
 
     <div class="card">
@@ -219,16 +221,17 @@ a {
 
     window.renderRecipes = function () {
       const list = document.getElementById("recipeList");
-      const search = document.getElementById("search").value.toLowerCase();
+      const searchTitle = document.getElementById("searchTitle").value.toLowerCase();
+const searchTags = document.getElementById("searchTags").value.toLowerCase();
+const searchIngredients = document.getElementById("searchIngredients").value.toLowerCase();
 
       list.innerHTML = "";
 
       const filteredRecipes = recipes.filter(recipe =>
-        (recipe.title || "").toLowerCase().includes(search) ||
-        (recipe.tags || "").toLowerCase().includes(search) ||
-        (recipe.ingredients || "").toLowerCase().includes(search) ||
-        (recipe.instructions || "").toLowerCase().includes(search)
-      );
+  (recipe.title || "").toLowerCase().includes(searchTitle) &&
+  (recipe.tags || "").toLowerCase().includes(searchTags) &&
+  (recipe.ingredients || "").toLowerCase().includes(searchIngredients)
+);
 
       if (filteredRecipes.length === 0) {
         list.innerHTML = "<p>Keine Rezepte gefunden.</p>";
