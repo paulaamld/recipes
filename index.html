@@ -25,7 +25,10 @@ a {
       text-align: center;
       font-size: 25px;
     }
-
+    
+.title-text {
+  color: white;
+}
     .container {
       max-width: 900px;
       margin: 0 auto;
@@ -112,7 +115,7 @@ a {
   <div class="container">
     <h1>
       ⭐️🌸🧸🌿<br>
-      MY RECIPES<br>
+        <span class="title-text">MY RECIPES</span><br>
       ⭐️🌸🧸🌿
     </h1>
 
@@ -242,11 +245,11 @@ const filteredRecipes = recipes.filter(recipe => {
     .map(t => t.trim())
     .filter(t => t);
 
-  const tagsMatch =
-    searchTagsArray.length === 0 ||
-    searchTagsArray.every(searchTag =>
-      recipeTags.every(recipeTag => recipeTag.includes(searchTag))
-    );
+ const tagsMatch =
+  searchTagsArray.length === 0 ||
+  searchTagsArray.every(searchTag =>
+    recipeTags.some(recipeTag => recipeTag.includes(searchTag))
+  );
 
   const ingredientsText = (recipe.ingredients || "").toLowerCase();
 
