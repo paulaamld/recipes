@@ -245,7 +245,7 @@ const filteredRecipes = recipes.filter(recipe => {
   const tagsMatch =
     searchTagsArray.length === 0 ||
     searchTagsArray.every(searchTag =>
-      recipeTags.some(recipeTag => recipeTag.includes(searchTag))
+      recipeTags.every(recipeTag => recipeTag.includes(searchTag))
     );
 
   const ingredientsText = (recipe.ingredients || "").toLowerCase();
