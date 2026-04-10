@@ -77,7 +77,6 @@ a {
     .small {
       color: #666;
       font-size: 14px;
-      white-space: pre-wrap;
     }
 
     .actions {
@@ -132,10 +131,13 @@ a {
     let editId = null;
 
     function linkify(text) {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRegex, url => {
-    return `<a href="${url}" target="_blank">${url}</a>`;
-  });
+  if (!text) return "";
+  return text
+    .replace(
+      /(https?:\/\/[^\s<]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+    )
+    .replace(/\n/g, "<br>");
 }
 
     async function loadRecipes() {
@@ -220,15 +222,15 @@ a {
         const div = document.createElement("div");
         div.className = "recipe";
         div.innerHTML = `
-          <h3>${recipe.title}</h3>
-          <p><strong>Tags:</strong> ${recipe.tags || "-"}</p>
-          <p class="small"><strong>Zutaten:</strong>\n${recipe.ingredients || ""}</p>
-          <p class="small"><strong>Zubereitung:</strong>\n${recipe.instructions || ""}</p>
-          <div class="actions">
-            <button onclick="editRecipe(${recipe.id})">Bearbeiten</button>
-            <button onclick="deleteRecipe(${recipe.id})">Löschen</button>
-          </div>
-        `;
+  <h3>${recipe.title}</h3>
+  <p><strong>Tags:</strong> ${recipe.tags || "-"}</p>
+  <p class="small"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
+  <p class="small"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
+  <div class="actions">
+    <button onclick="editRecipe(${recipe.id})">Bearbeiten</button>
+    <button onclick="deleteRecipe(${recipe.id})">Löschen</button>
+  </div>
+`;
         list.appendChild(div);
       });
     };
