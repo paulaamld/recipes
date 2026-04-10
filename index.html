@@ -116,51 +116,88 @@
     </div>
   </div>
 
-  <script>
-    let recipes = JSON.parse(localStorage.getItem("recipes")) || [];
-    let editIndex = null;
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    function saveRecipe() {
-      const name = document.getElementById("name").value.trim();
+    const SUPABASE_URL = "https://kdmdujfykezsyadtskcv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_qYiTwL6d6p4r-dzbK5Bm8A_qS28j4zk";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let recipes = [];
+    let editId = null;
+
+    async function loadRecipes() {
+      const { data, error } = await supabase
+        .from("recipes")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Fehler beim Laden:", error);
+        alert("Rezepte konnten nicht geladen werden.");
+        return;
+      }
+
+      recipes = data || [];
+      renderRecipes();
+    }
+
+    window.saveRecipe = async function () {
+      const title = document.getElementById("name").value.trim();
       const tags = document.getElementById("tags").value.trim();
       const ingredients = document.getElementById("ingredients").value.trim();
       const instructions = document.getElementById("instructions").value.trim();
 
-      if (!name || !ingredients || !instructions) {
+      if (!title || !ingredients || !instructions) {
         alert("Bitte mindestens Name, Zutaten und Zubereitung ausfüllen.");
         return;
       }
 
-      const recipe = { name, tags, ingredients, instructions };
+      if (editId === null) {
+        const { error } = await supabase.from("recipes").insert([
+          { title, tags, ingredients, instructions }
+        ]);
 
-      if (editIndex === null) {
-        recipes.push(recipe);
+        if (error) {
+          console.error("Fehler beim Speichern:", error);
+          alert("Rezept konnte nicht gespeichert werden.");
+          return;
+        }
       } else {
-        recipes[editIndex] = recipe;
-        editIndex = null;
-      }
+        const { error } = await supabase
+          .from("recipes")
+          .update({ title, tags, ingredients, instructions })
+          .eq("id", editId);
 
-      localStorage.setItem("recipes", JSON.stringify(recipes));
+        if (error) {
+          console.error("Fehler beim Aktualisieren:", error);
+          alert("Rezept konnte nicht aktualisiert werden.");
+          return;
+        }
+
+        editId = null;
+      }
 
       document.getElementById("name").value = "";
       document.getElementById("tags").value = "";
       document.getElementById("ingredients").value = "";
       document.getElementById("instructions").value = "";
 
-      renderRecipes();
-    }
+      await loadRecipes();
+    };
 
-    function renderRecipes() {
+    window.renderRecipes = function () {
       const list = document.getElementById("recipeList");
       const search = document.getElementById("search").value.toLowerCase();
 
       list.innerHTML = "";
 
       const filteredRecipes = recipes.filter(recipe =>
-        recipe.name.toLowerCase().includes(search) ||
-        recipe.tags.toLowerCase().includes(search) ||
-        recipe.ingredients.toLowerCase().includes(search) ||
-        recipe.instructions.toLowerCase().includes(search)
+        (recipe.title || "").toLowerCase().includes(search) ||
+        (recipe.tags || "").toLowerCase().includes(search) ||
+        (recipe.ingredients || "").toLowerCase().includes(search) ||
+        (recipe.instructions || "").toLowerCase().includes(search)
       );
 
       if (filteredRecipes.length === 0) {
@@ -169,42 +206,53 @@
       }
 
       filteredRecipes.forEach((recipe) => {
-        const realIndex = recipes.indexOf(recipe);
-
         const div = document.createElement("div");
         div.className = "recipe";
         div.innerHTML = `
-          <h3>${recipe.name}</h3>
+          <h3>${recipe.title}</h3>
           <p><strong>Tags:</strong> ${recipe.tags || "-"}</p>
-          <p class="small"><strong>Zutaten:</strong>\n${recipe.ingredients}</p>
-          <p class="small"><strong>Zubereitung:</strong>\n${recipe.instructions}</p>
+          <p class="small"><strong>Zutaten:</strong>\n${recipe.ingredients || ""}</p>
+          <p class="small"><strong>Zubereitung:</strong>\n${recipe.instructions || ""}</p>
           <div class="actions">
-            <button onclick="editRecipe(${realIndex})">Bearbeiten</button>
-            <button onclick="deleteRecipe(${realIndex})">Löschen</button>
+            <button onclick="editRecipe(${recipe.id})">Bearbeiten</button>
+            <button onclick="deleteRecipe(${recipe.id})">Löschen</button>
           </div>
         `;
         list.appendChild(div);
       });
-    }
+    };
 
-    function deleteRecipe(index) {
+    window.deleteRecipe = async function (id) {
       if (!confirm("Willst du dieses Rezept wirklich löschen?")) return;
-      recipes.splice(index, 1);
-      localStorage.setItem("recipes", JSON.stringify(recipes));
-      renderRecipes();
-    }
 
-    function editRecipe(index) {
-      const recipe = recipes[index];
-      document.getElementById("name").value = recipe.name;
-      document.getElementById("tags").value = recipe.tags;
-      document.getElementById("ingredients").value = recipe.ingredients;
-      document.getElementById("instructions").value = recipe.instructions;
-      editIndex = index;
+      const { error } = await supabase
+        .from("recipes")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Fehler beim Löschen:", error);
+        alert("Rezept konnte nicht gelöscht werden.");
+        return;
+      }
+
+      await loadRecipes();
+    };
+
+    window.editRecipe = function (id) {
+      const recipe = recipes.find(r => r.id === id);
+      if (!recipe) return;
+
+      document.getElementById("name").value = recipe.title || "";
+      document.getElementById("tags").value = recipe.tags || "";
+      document.getElementById("ingredients").value = recipe.ingredients || "";
+      document.getElementById("instructions").value = recipe.instructions || "";
+
+      editId = id;
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    };
 
-    renderRecipes();
+    loadRecipes();
   </script>
 </body>
 </html>
