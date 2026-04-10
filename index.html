@@ -229,14 +229,40 @@ const searchIngredients = document.getElementById("searchIngredients").value.toL
 
 const filteredRecipes = recipes.filter(recipe => {
   const titleMatch = (recipe.title || "").toLowerCase().includes(searchTitle);
-  const ingredientsMatch = (recipe.ingredients || "").toLowerCase().includes(searchIngredients);
 
-  const recipeTags = (recipe.tags || "").toLowerCase().split(",").map(t => t.trim());
-  const searchTagsArray = searchTags.split(",").map(t => t.trim()).filter(t => t);
+  const recipeTags = (recipe.tags || "")
+    .toLowerCase()
+    .split(/[;,]/)
+    .map(t => t.trim())
+    .filter(t => t);
 
-  const tagsMatch = searchTagsArray.length === 0 || searchTagsArray.every(tag => recipeTags.includes(tag));
+  const searchTagsArray = searchTags
+    .toLowerCase()
+    .split(/[;,]/)
+    .map(t => t.trim())
+    .filter(t => t);
 
-  return titleMatch && ingredientsMatch && tagsMatch;
+  const tagsMatch =
+    searchTagsArray.length === 0 ||
+    searchTagsArray.every(searchTag =>
+      recipeTags.some(recipeTag => recipeTag.includes(searchTag))
+    );
+
+  const ingredientsText = (recipe.ingredients || "").toLowerCase();
+
+  const searchIngredientsArray = searchIngredients
+    .toLowerCase()
+    .split(/[,\n;]/)
+    .map(i => i.trim())
+    .filter(i => i);
+
+  const ingredientsMatch =
+    searchIngredientsArray.length === 0 ||
+    searchIngredientsArray.every(searchIngredient =>
+      ingredientsText.includes(searchIngredient)
+    );
+
+  return titleMatch && tagsMatch && ingredientsMatch;
 });
 
       if (filteredRecipes.length === 0) {
