@@ -78,6 +78,15 @@ a {
       font-size: 24px;
       margin-bottom: 8px;
     }
+    .recipe-image {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 12px;
+  margin: 10px 0 12px 0;
+  object-fit: cover;
+}
 
     .small {
       color: #666;
@@ -122,8 +131,9 @@ a {
     <div class="card">
       <h2>New Recipe</h2>
       <input type="text" id="name" placeholder="Name" />
-      <input type="text" id="tags" placeholder="Tags" />
-      <textarea id="ingredients" placeholder="What"></textarea>
+     <input type="text" id="tags" placeholder="Tags" />
+    <input type="file" id="image" accept="image/*" />
+    <textarea id="ingredients" placeholder="What"></textarea>
       <textarea id="instructions" placeholder="How"></textarea>
       <button onclick="saveRecipe()">Save ⭐️</button>
     </div>
@@ -152,7 +162,31 @@ a {
     let recipes = [];
     let editId = null;
 
-    function linkify(text) {
+   async function uploadImage(file) {
+  if (!file) return null;
+
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  const filePath = `recipes/${fileName}`;
+
+  const { error } = await supabase.storage
+    .from("recipe-images")
+    .upload(filePath, file);
+
+  if (error) {
+    console.error(error);
+    alert("Bild Upload fehlgeschlagen");
+    return null;
+  }
+
+  const { data } = supabase.storage
+    .from("recipe-images")
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
+
+function linkify(text) {
   if (!text) return "";
   return text
     .replace(
@@ -183,15 +217,28 @@ a {
       const tags = document.getElementById("tags").value.trim();
       const ingredients = document.getElementById("ingredients").value.trim();
       const instructions = document.getElementById("instructions").value.trim();
+      const imageFile = document.getElementById("image").files[0];
 
-      if (!title || !ingredients || !instructions) {
-        alert("Bitte mindestens Name, Zutaten und Zubereitung ausfüllen.");
-        return;
-      }
+     if (!title || !ingredients || !instructions) {
+  alert("Bitte mindestens Name, Zutaten und Zubereitung ausfüllen.");
+  return;
+}
+
+let image_url = null;
+
+if (editId !== null) {
+  const existingRecipe = recipes.find(r => r.id === editId);
+  image_url = existingRecipe?.image_url || null;
+}
+
+if (imageFile) {
+  image_url = await uploadImage(imageFile);
+  if (!image_url) return;
+}
 
       if (editId === null) {
         const { error } = await supabase.from("recipes").insert([
-          { title, tags, ingredients, instructions }
+          { title, tags, ingredients, instructions, image_url }
         ]);
 
         if (error) {
@@ -202,7 +249,7 @@ a {
       } else {
         const { error } = await supabase
           .from("recipes")
-          .update({ title, tags, ingredients, instructions })
+        .update({ title, tags, ingredients, instructions, image_url })
           .eq("id", editId);
 
         if (error) {
@@ -216,6 +263,7 @@ a {
 
       document.getElementById("name").value = "";
       document.getElementById("tags").value = "";
+      document.getElementById("image").value = "";
       document.getElementById("ingredients").value = "";
       document.getElementById("instructions").value = "";
 
@@ -277,8 +325,9 @@ const filteredRecipes = recipes.filter(recipe => {
         const div = document.createElement("div");
         div.className = "recipe";
         div.innerHTML = `
-  <h3>${recipe.title}</h3>
- <p class="tags"><strong>Tags:</strong> ${recipe.tags || "-"}</p>
+ <h3>${recipe.title}</h3>
+${recipe.image_url ? `<img src="${recipe.image_url}" alt="${recipe.title}" class="recipe-image">` : ""}
+<p class="tags"><strong>Tags:</strong> ${recipe.tags || "-"}</p>
 <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
 <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
   <div class="actions">
@@ -308,17 +357,18 @@ const filteredRecipes = recipes.filter(recipe => {
     };
 
     window.editRecipe = function (id) {
-      const recipe = recipes.find(r => r.id === id);
-      if (!recipe) return;
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
 
-      document.getElementById("name").value = recipe.title || "";
-      document.getElementById("tags").value = recipe.tags || "";
-      document.getElementById("ingredients").value = recipe.ingredients || "";
-      document.getElementById("instructions").value = recipe.instructions || "";
+  document.getElementById("name").value = recipe.title || "";
+  document.getElementById("tags").value = recipe.tags || "";
+  document.getElementById("image").value = "";
+  document.getElementById("ingredients").value = recipe.ingredients || "";
+  document.getElementById("instructions").value = recipe.instructions || "";
 
-      editId = id;
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
+  editId = id;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
     loadRecipes();
   </script>
