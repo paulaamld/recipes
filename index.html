@@ -173,11 +173,11 @@ a {
     .from("recipe-images")
     .upload(filePath, file);
 
-  if (error) {
-    console.error(error);
-    alert("Bild Upload fehlgeschlagen");
-    return null;
-  }
+if (error) {
+  console.error("UPLOAD ERROR:", error);
+  alert("Upload Fehler: " + error.message);
+  return null;
+}
 
   const { data } = supabase.storage
     .from("recipe-images")
@@ -202,11 +202,7 @@ function linkify(text) {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Fehler beim Laden:", error);
-        alert("Rezepte konnten nicht geladen werden.");
-        return;
-      }
+    alert("DB Fehler: " + error.message);
 
       recipes = data || [];
       renderRecipes();
@@ -241,11 +237,8 @@ if (imageFile) {
           { title, tags, ingredients, instructions, image_url }
         ]);
 
-        if (error) {
-          console.error("Fehler beim Speichern:", error);
-          alert("Rezept konnte nicht gespeichert werden.");
-          return;
-        }
+      alert("DB Fehler: " + error.message);
+        
       } else {
         const { error } = await supabase
           .from("recipes")
