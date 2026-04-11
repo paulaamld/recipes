@@ -175,11 +175,7 @@ a {
 
 if (error) {
   console.error("UPLOAD ERROR:", error);
-if (error) {
-  console.error(error);
-  alert("DB Fehler: " + error.message);
-  return;
-}
+  alert("Upload Fehler: " + error.message);
   return null;
 }
 
@@ -206,17 +202,9 @@ function linkify(text) {
         .select("*")
         .order("created_at", { ascending: false });
 
-    if (error) {
-  console.error(error);
-if (error) {
-  console.error(error);
   if (error) {
-  console.error(error);
-  alert("DB Fehler: " + error.message);
-  return;
-}
-  return;
-}
+  console.error("LOAD ERROR:", error);
+  alert("DB Fehler beim Laden: " + error.message);
   return;
 }
 
@@ -265,11 +253,11 @@ if (imageFile) {
         .update({ title, tags, ingredients, instructions, image_url })
           .eq("id", editId);
 
-        if (error) {
-          console.error("Fehler beim Aktualisieren:", error);
-          alert("Rezept konnte nicht aktualisiert werden.");
-          return;
-        }
+       if (error) {
+  console.error("UPDATE ERROR:", error);
+  alert("DB Fehler beim Aktualisieren: " + error.message);
+  return;
+}
 
         editId = null;
       }
