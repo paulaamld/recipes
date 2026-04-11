@@ -126,7 +126,7 @@ select:focus {
   border-color: #ccc;
   box-shadow: none;
 }
-        select {
+       select {
   width: 100%;
   padding: 12px;
   margin-top: 8px;
@@ -138,6 +138,11 @@ select:focus {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  color: #222;
+}
+
+select:invalid {
+  color: #999;
 }
     .recipe-title-row {
   display: flex;
@@ -181,7 +186,8 @@ select:focus {
 <input type="text" id="tags" placeholder="Tags" />
 
 <select id="status">
-  <option value="tested" selected>Tested</option>
+  <option value="" disabled selected hidden>Status</option>
+  <option value="tested">Tested</option>
   <option value="new">New</option>
 </select>
 
@@ -197,7 +203,8 @@ select:focus {
 <input type="text" id="searchIngredients" placeholder="Ingredients ..." oninput="renderRecipes()" />
 
 <select id="searchStatus" onchange="renderRecipes()">
-  <option value="tested" selected>Tested</option>
+  <option value="" disabled selected hidden>Status</option>
+  <option value="tested">Tested</option>
   <option value="new">New</option>
   <option value="all">All</option>
 </select>
