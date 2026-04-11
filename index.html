@@ -175,7 +175,11 @@ a {
 
 if (error) {
   console.error("UPLOAD ERROR:", error);
-  alert("Upload Fehler: " + error.message);
+if (error) {
+  console.error(error);
+  alert("DB Fehler: " + error.message);
+  return;
+}
   return null;
 }
 
@@ -202,7 +206,19 @@ function linkify(text) {
         .select("*")
         .order("created_at", { ascending: false });
 
-    alert("DB Fehler: " + error.message);
+    if (error) {
+  console.error(error);
+if (error) {
+  console.error(error);
+  if (error) {
+  console.error(error);
+  alert("DB Fehler: " + error.message);
+  return;
+}
+  return;
+}
+  return;
+}
 
       recipes = data || [];
       renderRecipes();
@@ -237,7 +253,11 @@ if (imageFile) {
           { title, tags, ingredients, instructions, image_url }
         ]);
 
-      alert("DB Fehler: " + error.message);
+ if (error) {
+  console.error(error);
+  alert("DB Fehler: " + error.message);
+  return;
+}
         
       } else {
         const { error } = await supabase
