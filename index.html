@@ -195,11 +195,17 @@ select:invalid {
 <textarea id="ingredients" placeholder="What"></textarea>
 <textarea id="instructions" placeholder="How"></textarea>
 <button onclick="saveRecipe()">Save ⭐️</button>
-
+</div>
     <div class="card">
       <h2>Search</h2>
      <input type="text" id="searchTitle" placeholder="Title ..." oninput="renderRecipes()" />
-<input type="text" id="searchTags" placeholder="Tags ..." oninput="renderRecipes()" />
+<div class="tag-filter-wrap">
+  <input type="text" id="searchTags" placeholder="Tags ..." readonly />
+  <div id="tagDropdown" class="tag-dropdown hidden">
+    <input type="text" id="tagDropdownSearch" placeholder="Tag suchen ..." />
+    <div id="tagOptions" class="tag-options"></div>
+  </div>
+</div>
 <input type="text" id="searchIngredients" placeholder="Ingredients ..." oninput="renderRecipes()" />
 
 <select id="searchStatus" onchange="renderRecipes()">
@@ -225,6 +231,8 @@ select:invalid {
 
     let recipes = [];
     let editId = null;
+
+    let selectedSearchTags = [];
 
    async function uploadImage(file) {
   if (!file) return null;
