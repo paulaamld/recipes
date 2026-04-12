@@ -112,14 +112,15 @@ a {
 }
 
 .tag-pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: bold;
   line-height: 1;
-  background: pink;
-  color: white;
+  background: #ffe4ec;   
+  color: #d85c8d;        
 }
 
     .content-text {
@@ -381,6 +382,7 @@ let selectedSearchTags = [];
 
 const TAG_GROUPS = {
   "Main ingredient": ["Meat", "Chicken", "Fish", "Vegetarian"],
+  "Sides": ["Pasta", "Potatoes", "Quinoa", "Rice", "Wraps"],
   "Difficulty": ["Easy", "Medium", "Hard"]
 };
 
