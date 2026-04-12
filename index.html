@@ -118,8 +118,8 @@ a {
   font-size: 13px;
   font-weight: bold;
   line-height: 1;
-  background: #f3e4ea;
-  color: #8a5f6f;
+  background: pink;
+  color: white;
 }
 
     .content-text {
@@ -258,6 +258,39 @@ select:invalid {
   color: #777;
   cursor: default;
 }
+    .tag-clear-btn {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 10px;
+  background: #fff4f7;
+  color: #d85c8d;
+  border: 1px solid #f3c3d3;
+  font-weight: bold;
+  text-align: left;
+}
+
+.tag-clear-btn:hover {
+  background: #ffeaf1;
+}
+
+.tag-group {
+  margin-bottom: 12px;
+}
+
+.tag-group-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #d85c8d;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+}
+
+.tag-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+    
   </style>
 </head>
 <body>
@@ -290,9 +323,11 @@ select:invalid {
 <div class="tag-filter-wrap">
   <input type="text" id="searchTags" placeholder="Tags ..." readonly />
   <div id="tagDropdown" class="tag-dropdown hidden">
-    <input type="text" id="tagDropdownSearch" placeholder="Tag suchen ..." />
-    <div id="tagOptions" class="tag-options"></div>
-  </div>
+  <div id="tagDropdown" class="tag-dropdown hidden">
+  <input type="text" id="tagDropdownSearch" placeholder="Search tags ..." />
+  <button type="button" id="clearTagSelection" class="tag-clear-btn">Clear all selections</button>
+  <div id="tagOptions" class="tag-options"></div>
+</div>
 </div>
 <input type="text" id="searchIngredients" placeholder="Ingredients ..." oninput="renderRecipes()" />
 
@@ -317,9 +352,17 @@ select:invalid {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let recipes = [];
-    let editId = null;
-    let selectedSearchTags = [];
+   let recipes = [];
+let editId = null;
+let selectedSearchTags = [];
+
+const TAG_GROUPS = {
+  "Main ingredient": ["Meat", "Chicken", "Fish", "Vegetarian"],
+  "Difficulty": ["Easy", "Medium", "Hard"]
+};
+
+const MAIN_TAG_ORDER = ["Meat", "Chicken", "Fish", "Vegetarian"];
+const DIFFICULTY_TAG_ORDER = ["Easy", "Medium", "Hard"];
 
    async function uploadImage(file) {
   if (!file) return null;
@@ -363,6 +406,56 @@ function parseTags(tagsString) {
     .map(tag => tag.trim())
     .filter(tag => tag.length > 0);
 }
+    function sortTags(tagsArray) {
+  if (!tagsArray || !tagsArray.length) return [];
+
+  const normalizedMainTags = new Map(
+    MAIN_TAG_ORDER.map(tag => [tag.toLowerCase(), tag])
+  );
+
+  const normalizedDifficultyTags = new Map(
+    DIFFICULTY_TAG_ORDER.map(tag => [tag.toLowerCase(), tag])
+  );
+
+  const seen = new Set();
+  const cleanedTags = tagsArray
+    .map(tag => tag.trim())
+    .filter(tag => tag.length > 0)
+    .filter(tag => {
+      const key = tag.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+  const mainTags = [];
+  const otherTags = [];
+  const difficultyTags = [];
+
+  cleanedTags.forEach(tag => {
+    const lowerTag = tag.toLowerCase();
+
+    if (normalizedMainTags.has(lowerTag)) {
+      mainTags.push(normalizedMainTags.get(lowerTag));
+    } else if (normalizedDifficultyTags.has(lowerTag)) {
+      difficultyTags.push(normalizedDifficultyTags.get(lowerTag));
+    } else {
+      otherTags.push(tag);
+    }
+  });
+
+  mainTags.sort((a, b) => MAIN_TAG_ORDER.indexOf(a) - MAIN_TAG_ORDER.indexOf(b));
+
+  otherTags.sort((a, b) =>
+    a.localeCompare(b, "de", { sensitivity: "base" })
+  );
+
+  difficultyTags.sort((a, b) =>
+    DIFFICULTY_TAG_ORDER.indexOf(a) - DIFFICULTY_TAG_ORDER.indexOf(b)
+  );
+
+  return [...mainTags, ...otherTags, ...difficultyTags];
+}
   
 function getAllTags() {
   const tagSet = new Set();
@@ -383,25 +476,76 @@ function syncSearchTagsInput() {
 function renderTagDropdown(filterText = "") {
   const tagOptions = document.getElementById("tagOptions");
   const allTags = getAllTags();
+  const filter = filterText.toLowerCase();
 
-  const filteredTags = allTags.filter(tag =>
-    tag.toLowerCase().includes(filterText.toLowerCase())
+  let html = "";
+  let hasVisibleTags = false;
+
+  Object.entries(TAG_GROUPS).forEach(([groupName, groupTags]) => {
+    const availableTags = groupTags.filter(groupTag =>
+      allTags.some(existingTag => existingTag.toLowerCase() === groupTag.toLowerCase())
+    );
+
+    const filteredGroupTags = availableTags.filter(tag =>
+      tag.toLowerCase().includes(filter)
+    );
+
+    if (filteredGroupTags.length > 0) {
+      hasVisibleTags = true;
+
+      html += `
+        <div class="tag-group">
+          <div class="tag-group-title">${groupName}</div>
+          <div class="tag-group-items">
+            ${filteredGroupTags.map(tag => {
+              const checked = selectedSearchTags.includes(tag) ? "checked" : "";
+              return `
+                <label class="tag-option">
+                  <input type="checkbox" value="${tag}" ${checked}>
+                  <span>${tag}</span>
+                </label>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  const groupedTagsFlat = Object.values(TAG_GROUPS).flat().map(tag => tag.toLowerCase());
+
+  const otherTags = allTags.filter(tag =>
+    !groupedTagsFlat.includes(tag.toLowerCase()) &&
+    tag.toLowerCase().includes(filter)
   );
 
-  if (filteredTags.length === 0) {
-    tagOptions.innerHTML = `<div class="tag-option empty">Keine Tags gefunden.</div>`;
+  if (otherTags.length > 0) {
+    hasVisibleTags = true;
+
+    html += `
+      <div class="tag-group">
+        <div class="tag-group-title">Other tags</div>
+        <div class="tag-group-items">
+          ${otherTags.map(tag => {
+            const checked = selectedSearchTags.includes(tag) ? "checked" : "";
+            return `
+              <label class="tag-option">
+                <input type="checkbox" value="${tag}" ${checked}>
+                <span>${tag}</span>
+              </label>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  if (!hasVisibleTags) {
+    tagOptions.innerHTML = `<div class="tag-option empty">No tags found.</div>`;
     return;
   }
 
-  tagOptions.innerHTML = filteredTags.map(tag => {
-    const checked = selectedSearchTags.includes(tag) ? "checked" : "";
-    return `
-      <label class="tag-option">
-        <input type="checkbox" value="${tag}" ${checked}>
-        <span>${tag}</span>
-      </label>
-    `;
-  }).join("");
+  tagOptions.innerHTML = html;
 
   tagOptions.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener("change", (e) => {
@@ -415,7 +559,7 @@ function renderTagDropdown(filterText = "") {
         selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
       }
 
-      selectedSearchTags.sort((a, b) => a.localeCompare(b, "de", { sensitivity: "base" }));
+     selectedSearchTags = sortTags(selectedSearchTags);
       syncSearchTagsInput();
       renderTagDropdown(document.getElementById("tagDropdownSearch").value);
     });
@@ -426,6 +570,7 @@ function setupTagDropdown() {
   const searchTagsInput = document.getElementById("searchTags");
   const tagDropdown = document.getElementById("tagDropdown");
   const tagDropdownSearch = document.getElementById("tagDropdownSearch");
+  const clearTagSelection = document.getElementById("clearTagSelection");
 
   searchTagsInput.addEventListener("focus", () => {
     tagDropdown.classList.remove("hidden");
@@ -442,7 +587,12 @@ function setupTagDropdown() {
   tagDropdownSearch.addEventListener("input", (e) => {
     renderTagDropdown(e.target.value);
   });
-
+  clearTagSelection.addEventListener("click", () => {
+    selectedSearchTags = [];
+    tagDropdownSearch.value = "";
+    syncSearchTagsInput();
+    renderTagDropdown("");
+  });
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".tag-filter-wrap")) {
       tagDropdown.classList.add("hidden");
@@ -469,8 +619,8 @@ renderTagDropdown("");
 
     window.saveRecipe = async function () {
       const title = document.getElementById("name").value.trim();
-      const rawTags = document.getElementById("tags").value.trim();
-      const tags = parseTags(rawTags).join(", ");
+     const rawTags = document.getElementById("tags").value.trim();
+      const tags = sortTags(parseTags(rawTags)).join(", ");
       const status = document.getElementById("status").value;
       const ingredients = document.getElementById("ingredients").value.trim();
       const instructions = document.getElementById("instructions").value.trim();
@@ -592,10 +742,11 @@ div.innerHTML = `
     <span class="tags-label">Tags:</span>
     <div class="tags-list">
       ${
-        parseTags(recipe.tags).length
-          ? parseTags(recipe.tags).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
-          : `<span>-</span>`
-      }
+        ${
+  sortTags(parseTags(recipe.tags)).length
+    ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
+    : `<span>-</span>`
+}
     </div>
   </div>
   <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
