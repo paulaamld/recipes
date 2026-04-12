@@ -290,6 +290,30 @@ select:invalid {
   flex-direction: column;
   gap: 6px;
 }
+
+input[type="file"] {
+  color: #999;
+}
+
+input[type="file"]::file-selector-button {
+  color: #999;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  color: #999;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-right: 10px;
+  cursor: pointer;
+}    
     
   </style>
 </head>
@@ -319,17 +343,17 @@ select:invalid {
 </div>
     <div class="card">
       <h2>Search</h2>
-     <input type="text" id="searchTitle" placeholder="Title ..." oninput="renderRecipes()" />
+     <input type="text" id="searchTitle" placeholder="Title" oninput="renderRecipes()" />
 <div class="tag-filter-wrap">
-  <input type="text" id="searchTags" placeholder="Tags ..." readonly />
+  <input type="text" id="searchTags" placeholder="Tags" readonly />
   <div id="tagDropdown" class="tag-dropdown hidden">
   <div id="tagDropdown" class="tag-dropdown hidden">
-  <input type="text" id="tagDropdownSearch" placeholder="Search tags ..." />
+  <input type="text" id="tagDropdownSearch" placeholder="Search tags" />
   <button type="button" id="clearTagSelection" class="tag-clear-btn">Clear all selections</button>
   <div id="tagOptions" class="tag-options"></div>
 </div>
 </div>
-<input type="text" id="searchIngredients" placeholder="Ingredients ..." oninput="renderRecipes()" />
+<input type="text" id="searchIngredients" placeholder="Ingredients" oninput="renderRecipes()" />
 
 <select id="searchStatus" onchange="renderRecipes()">
   <option value="tested" selected>Tested</option>
