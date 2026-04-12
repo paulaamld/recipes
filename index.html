@@ -111,16 +111,16 @@ a {
   gap: 8px;
 }
 
-.tag-pill {
+..tag-pill {
   display: inline-flex;
   align-items: center;
   padding: 6px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: bold;
-  line-height: 1;
-  background: #ffe4ec;   
-  color: #d85c8d;        
+  line-height: 1.2;
+  background: #ffe4ec;
+  color: #d85c8d;
 }
 
     .content-text {
@@ -133,6 +133,28 @@ a {
       gap: 10px;
       margin-top: 10px;
     }
+
+    .recipe-details {
+  display: none;
+  margin-top: 12px;
+}
+
+.recipe-details.open {
+  display: block;
+}
+
+.toggle-details-btn {
+  margin-top: 10px;
+  margin-bottom: 0;
+  background: #fff4f7;
+  color: #d85c8d;
+  border: 1px solid #f3c3d3;
+  font-weight: bold;
+}
+
+.toggle-details-btn:hover {
+  background: #ffeaf1;
+}
 
     .actions button {
       width: auto;
@@ -381,12 +403,12 @@ let editId = null;
 let selectedSearchTags = [];
 
 const TAG_GROUPS = {
-  "Main ingredient": ["Meat", "Chicken", "Fish", "Vegetarian"],
+  "Main ingredient": ["Meat", "Chicken", "Fish", "Vegetarian", "Sweet"],
   "Sides": ["Pasta", "Potatoes", "Quinoa", "Rice", "Wraps"],
   "Difficulty": ["Easy", "Medium", "Hard"]
 };
 
-const MAIN_TAG_ORDER = ["Meat", "Chicken", "Fish", "Vegetarian"];
+const MAIN_TAG_ORDER = ["Meat", "Chicken", "Fish", "Vegetarian", "Sweet"];
 const DIFFICULTY_TAG_ORDER = ["Easy", "Medium", "Hard"];
 
    async function uploadImage(file) {
@@ -512,7 +534,7 @@ function renderTagDropdown(filterText = "") {
     );
 
     const filteredGroupTags = availableTags.filter(tag =>
-      tag.toLowerCase().includes(filter)
+    tag.toLowerCase().startsWith(filter)
     );
 
     if (filteredGroupTags.length > 0) {
@@ -539,10 +561,10 @@ function renderTagDropdown(filterText = "") {
 
   const groupedTagsFlat = Object.values(TAG_GROUPS).flat().map(tag => tag.toLowerCase());
 
-  const otherTags = allTags.filter(tag =>
-    !groupedTagsFlat.includes(tag.toLowerCase()) &&
-    tag.toLowerCase().includes(filter)
-  );
+ const otherTags = allTags.filter(tag =>
+  !groupedTagsFlat.includes(tag.toLowerCase()) &&
+  tag.toLowerCase().startsWith(filter)
+);
 
   if (otherTags.length > 0) {
     hasVisibleTags = true;
@@ -765,16 +787,29 @@ div.innerHTML = `
   ${recipe.image_url ? `<img src="${recipe.image_url}" alt="${recipe.title}" class="recipe-image">` : ""}
   <div class="tags">
     <span class="tags-label">Tags:</span>
-   <div class="tags-list">
-  ${
-    sortTags(parseTags(recipe.tags)).length
-      ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
-      : `<span>-</span>`
-  }
-</div>
+    <div class="tags-list">
+      ${
+        sortTags(parseTags(recipe.tags)).length
+          ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
+          : `<span>-</span>`
+      }
+    </div>
   </div>
-  <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
-  <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
+
+  <button
+    type="button"
+    class="toggle-details-btn"
+    id="toggle-details-btn-${recipe.id}"
+    onclick="toggleRecipeDetails(${recipe.id})"
+  >
+    Show details
+  </button>
+
+  <div class="recipe-details" id="recipe-details-${recipe.id}">
+    <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
+    <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
+  </div>
+
   <div class="actions">
     <button onclick="editRecipe(${recipe.id})">Edit</button>
     <button onclick="deleteRecipe(${recipe.id})">Delete</button>
@@ -801,6 +836,23 @@ div.innerHTML = `
       await loadRecipes();
     };
 
+    window.toggleRecipeDetails = function (id) {
+  const details = document.getElementById(`recipe-details-${id}`);
+  const button = document.getElementById(`toggle-details-btn-${id}`);
+
+  if (!details || !button) return;
+
+  const isOpen = details.classList.contains("open");
+
+  if (isOpen) {
+    details.classList.remove("open");
+    button.textContent = "Show details";
+  } else {
+    details.classList.add("open");
+    button.textContent = "Hide details";
+  }
+};
+    
     window.editRecipe = function (id) {
   const recipe = recipes.find(r => r.id === id);
   if (!recipe) return;
