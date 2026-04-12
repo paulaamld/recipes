@@ -170,6 +170,71 @@ select:invalid {
       background: #ffe4cc;
       color: #b56a2d;
     }
+    .tag-filter-wrap {
+  position: relative;
+}
+
+#searchTags {
+  margin-bottom: 12px;
+  cursor: pointer;
+  background: white;
+}
+
+.tag-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 10px;
+  z-index: 20;
+}
+
+.tag-dropdown.hidden {
+  display: none;
+}
+
+#tagDropdownSearch {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.tag-options {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tag-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.tag-option:hover {
+  background: #f8f8f8;
+}
+
+.tag-option input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-option.empty {
+  color: #777;
+  cursor: default;
+}
   </style>
 </head>
 <body>
@@ -231,7 +296,6 @@ select:invalid {
 
     let recipes = [];
     let editId = null;
-
     let selectedSearchTags = [];
 
    async function uploadImage(file) {
@@ -267,6 +331,96 @@ function linkify(text) {
     )
     .replace(/\n/g, "<br>");
 }
+  
+function getAllTags() {
+  const tagSet = new Set();
+
+  recipes.forEach(recipe => {
+    (recipe.tags || "")
+      .split(/[;,]/)
+      .map(tag => tag.trim())
+      .filter(tag => tag)
+      .forEach(tag => tagSet.add(tag));
+  });
+
+  return [...tagSet].sort((a, b) => a.localeCompare(b, "de", { sensitivity: "base" }));
+}
+
+function syncSearchTagsInput() {
+  const input = document.getElementById("searchTags");
+  input.value = selectedSearchTags.join(", ");
+  renderRecipes();
+}
+
+function renderTagDropdown(filterText = "") {
+  const tagOptions = document.getElementById("tagOptions");
+  const allTags = getAllTags();
+
+  const filteredTags = allTags.filter(tag =>
+    tag.toLowerCase().includes(filterText.toLowerCase())
+  );
+
+  if (filteredTags.length === 0) {
+    tagOptions.innerHTML = `<div class="tag-option empty">Keine Tags gefunden.</div>`;
+    return;
+  }
+
+  tagOptions.innerHTML = filteredTags.map(tag => {
+    const checked = selectedSearchTags.includes(tag) ? "checked" : "";
+    return `
+      <label class="tag-option">
+        <input type="checkbox" value="${tag}" ${checked}>
+        <span>${tag}</span>
+      </label>
+    `;
+  }).join("");
+
+  tagOptions.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener("change", (e) => {
+      const tag = e.target.value;
+
+      if (e.target.checked) {
+        if (!selectedSearchTags.includes(tag)) {
+          selectedSearchTags.push(tag);
+        }
+      } else {
+        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
+      }
+
+      selectedSearchTags.sort((a, b) => a.localeCompare(b, "de", { sensitivity: "base" }));
+      syncSearchTagsInput();
+      renderTagDropdown(document.getElementById("tagDropdownSearch").value);
+    });
+  });
+}
+
+function setupTagDropdown() {
+  const searchTagsInput = document.getElementById("searchTags");
+  const tagDropdown = document.getElementById("tagDropdown");
+  const tagDropdownSearch = document.getElementById("tagDropdownSearch");
+
+  searchTagsInput.addEventListener("focus", () => {
+    tagDropdown.classList.remove("hidden");
+    tagDropdownSearch.value = "";
+    renderTagDropdown("");
+  });
+
+  searchTagsInput.addEventListener("click", () => {
+    tagDropdown.classList.remove("hidden");
+    tagDropdownSearch.value = "";
+    renderTagDropdown("");
+  });
+
+  tagDropdownSearch.addEventListener("input", (e) => {
+    renderTagDropdown(e.target.value);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".tag-filter-wrap")) {
+      tagDropdown.classList.add("hidden");
+    }
+  });
+}
 
     async function loadRecipes() {
       const { data, error } = await supabase
@@ -281,7 +435,8 @@ function linkify(text) {
 }
 
       recipes = data || [];
-      renderRecipes();
+renderRecipes();
+renderTagDropdown("");
     }
 
     window.saveRecipe = async function () {
@@ -348,7 +503,7 @@ if (imageFile) {
     window.renderRecipes = function () {
       const list = document.getElementById("recipeList");
       const searchTitle = document.getElementById("searchTitle").value.toLowerCase();
-      const searchTags = document.getElementById("searchTags").value.toLowerCase();
+     const searchTags = selectedSearchTags.map(tag => tag.toLowerCase());
       const searchIngredients = document.getElementById("searchIngredients").value.toLowerCase();
       const searchStatus = document.getElementById("searchStatus").value;
 
@@ -363,11 +518,7 @@ const filteredRecipes = recipes.filter(recipe => {
     .map(t => t.trim())
     .filter(t => t);
 
-  const searchTagsArray = searchTags
-    .toLowerCase()
-    .split(/[;,]/)
-    .map(t => t.trim())
-    .filter(t => t);
+  const searchTagsArray = searchTags;
 
  const tagsMatch =
   searchTagsArray.length === 0 ||
@@ -459,7 +610,8 @@ div.innerHTML = `
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-    loadRecipes();
+   setupTagDropdown();
+loadRecipes();
   </script>
 </body>
 </html>
