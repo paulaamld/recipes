@@ -347,11 +347,10 @@ input[type="file"]::-webkit-file-upload-button {
 <div class="tag-filter-wrap">
   <input type="text" id="searchTags" placeholder="Tags" readonly />
   <div id="tagDropdown" class="tag-dropdown hidden">
-  <div id="tagDropdown" class="tag-dropdown hidden">
-  <input type="text" id="tagDropdownSearch" placeholder="Search tags" />
-  <button type="button" id="clearTagSelection" class="tag-clear-btn">Clear all selections</button>
-  <div id="tagOptions" class="tag-options"></div>
-</div>
+    <input type="text" id="tagDropdownSearch" placeholder="Search tags" />
+    <button type="button" id="clearTagSelection" class="tag-clear-btn">Clear all selections</button>
+    <div id="tagOptions" class="tag-options"></div>
+  </div>
 </div>
 <input type="text" id="searchIngredients" placeholder="Ingredients" oninput="renderRecipes()" />
 
@@ -764,14 +763,13 @@ div.innerHTML = `
   ${recipe.image_url ? `<img src="${recipe.image_url}" alt="${recipe.title}" class="recipe-image">` : ""}
   <div class="tags">
     <span class="tags-label">Tags:</span>
-    <div class="tags-list">
-      ${
-        ${
-  sortTags(parseTags(recipe.tags)).length
-    ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
-    : `<span>-</span>`
-}
-    </div>
+   <div class="tags-list">
+  ${
+    sortTags(parseTags(recipe.tags)).length
+      ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
+      : `<span>-</span>`
+  }
+</div>
   </div>
   <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
   <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
