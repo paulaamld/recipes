@@ -588,12 +588,16 @@ div.innerHTML = `
     <span class="status-pill ${statusClass}">${statusLabel}</span>
   </div>
   ${recipe.image_url ? `<img src="${recipe.image_url}" alt="${recipe.title}" class="recipe-image">` : ""}
-  const recipeTags = parseTags(recipe.tags).map(tag => tag.toLowerCase());
-const searchTagsArray = searchTags;
-
-const tagsMatch =
-  searchTagsArray.length === 0 ||
-  searchTagsArray.every(searchTag => recipeTags.includes(searchTag));
+  <div class="tags">
+    <span class="tags-label">Tags:</span>
+    <div class="tags-list">
+      ${
+        parseTags(recipe.tags).length
+          ? parseTags(recipe.tags).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
+          : `<span>-</span>`
+      }
+    </div>
+  </div>
   <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
   <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
   <div class="actions">
