@@ -776,8 +776,8 @@ div.innerHTML = `
   <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
   <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
   <div class="actions">
-    <button onclick="editRecipe(${recipe.id})">Bearbeiten</button>
-    <button onclick="deleteRecipe(${recipe.id})">Löschen</button>
+    <button onclick="editRecipe(${recipe.id})">Edit</button>
+    <button onclick="deleteRecipe(${recipe.id})">Delete</button>
   </div>
 `;
         list.appendChild(div);
