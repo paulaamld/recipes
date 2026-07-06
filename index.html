@@ -4,42 +4,108 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meine Rezepte</title>
+
   <style>
     * {
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #FFC0CB;
+      --card: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --accent: pink;
+      --accent-dark: #c85b7d;
+      --border: #f1d8df;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
-      background: #FFC0CB;
-      color: #222;
+      padding: 28px;
+      background: var(--bg);
+      color: var(--text);
     }
-a {
-  color: blue;
-  text-decoration: underline;
-}
-    h1 {
-      margin-top: 0;
-      text-align: center;
-      font-size: 38px;
+
+    a {
+      color: blue;
+      text-decoration: underline;
     }
-    
-.title-text {
-  color: white;
-}
+
     .container {
-      max-width: 900px;
+      max-width: 1180px;
       margin: 0 auto;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.15;
+    }
+
+    .title-text {
+      color: white;
+    }
+
+    .stats {
+      margin-top: 8px;
+      color: white;
+      font-weight: 700;
+      font-size: 17px;
+    }
+
+    .page-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .nav-button {
+      background: white;
+      color: var(--accent-dark);
+      border: 2px solid white;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .nav-button.active {
+      background: var(--accent-dark);
+      color: white;
+      border-color: var(--accent-dark);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
     }
 
     .card {
       background: white;
-      padding: 16px;
-      border-radius: 14px;
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .section-head h2 {
+      margin: 0;
     }
 
     input, textarea, button {
@@ -53,341 +119,219 @@ a {
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
 
     button {
-      background: pink;
+      background: var(--accent);
       color: white;
       border: none;
       cursor: pointer;
+      font-weight: 700;
     }
 
     button:hover {
       opacity: 0.9;
     }
 
-    .recipe {
-      border-top: 1px solid #eee;
-      padding-top: 12px;
-      margin-top: 12px;
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
     }
 
-    .recipe h3 {
-      font-size: 24px;
-      margin-bottom: 8px;
+    .recipe-tile {
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
     }
-    .recipe-image {
-  display: block;
-  width: 100%;
-  max-width: 320px;
-  height: auto;
-  border-radius: 12px;
-  margin: 10px 0 12px 0;
-  object-fit: cover;
-}
+
+    .recipe-tile-header {
+      min-height: 100px;
+      padding: 18px;
+      background: rgba(255, 192, 203, 0.38);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .recipe-tile h3 {
+      font-size: 24px;
+      line-height: 1.18;
+      margin: 0;
+    }
+
+    .recipe-tile-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
 
     .small {
-      color: #666;
+      color: var(--muted);
       font-size: 14px;
     }
 
-.tags {
-  margin: 10px 0 14px 0;
-}
+    .label {
+      margin: 0 0 8px;
+      font-weight: 700;
+      color: var(--accent-dark);
+    }
 
-.tags-label {
-  display: block;
-  font-size: 14px;
-  font-weight: bold;
-  color: #555;
-  margin-bottom: 8px;
-}
-
-.tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-..tag-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.2;
-  background: #ffe4ec;
-  color: #d85c8d;
-}
-
-    .content-text {
-  font-size: 16px;
-  color: #000;
-}
-    
-    .actions {
+    .tag-row {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tag-chip {
+      display: inline-block;
+      background: #f7dce5;
+      color: var(--accent-dark);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .recipe-preview {
+      color: #333;
+      font-size: 15px;
+      line-height: 1.45;
+      margin: 0 0 16px;
+    }
+
+    .primary-btn {
+      margin-top: auto;
+      background: var(--accent-dark);
     }
 
     .recipe-details {
-  display: none;
-  margin-top: 12px;
-}
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
 
-.recipe-details.open {
-  display: block;
-}
+    .recipe-details h4 {
+      margin: 12px 0 6px;
+    }
 
-.toggle-details-btn {
-  margin-top: 10px;
-  margin-bottom: 0;
-  background: #fff4f7;
-  color: #d85c8d;
-  border: 1px solid #f3c3d3;
-  font-weight: bold;
-}
+    .content-text {
+      font-size: 15px;
+      color: #000;
+      line-height: 1.45;
+    }
 
-.toggle-details-btn:hover {
-  background: #ffeaf1;
-}
+    .hidden {
+      display: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
 
     .actions button {
-      width: auto;
-      padding: 10px 14px;
+      margin: 0;
     }
 
-    #search {
-      margin-bottom: 0;
+    .secondary-btn {
+      background: white;
+      color: var(--accent-dark);
+      border: 1px solid var(--border);
     }
 
-    input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: #ccc;
-  box-shadow: none;
-}
-       select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  background: white;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  color: #222;
-}
-
-select:invalid {
-  color: #999;
-}
-    .recipe-title-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
-    .status-pill {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: bold;
-      line-height: 1;
+    .empty-state {
+      background: white;
+      border-radius: 18px;
+      padding: 20px;
+      color: var(--muted);
     }
 
-    .status-tested {
-      background: #dfeee3;
-      color: #4f6b57;
+    @media (max-width: 950px) {
+      .recipe-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
-    .status-new {
-      background: #ffe4cc;
-      color: #b56a2d;
+    @media (max-width: 650px) {
+      body {
+        padding: 18px;
+      }
+
+      .page-nav {
+        flex-direction: column;
+      }
+
+      .recipe-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
     }
-    .tag-filter-wrap {
-  position: relative;
-}
-
-#searchTags {
-  margin-bottom: 12px;
-  cursor: pointer;
-  background: white;
-}
-
-.tag-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  padding: 10px;
-  z-index: 999;
-}
-
-.tag-dropdown.hidden {
-  display: none;
-}
-
-#tagDropdownSearch {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-.tag-options {
-  max-height: 220px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.tag-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-  user-select: none;
-}
-
-.tag-option:hover {
-  background: #f8f8f8;
-}
-
-.tag-option input[type="checkbox"] {
-  width: auto;
-  margin: 0;
-  padding: 0;
-}
-
-.tag-option.empty {
-  color: #777;
-  cursor: default;
-}
-    .tag-clear-btn {
-  width: 100%;
-  margin-top: 0;
-  margin-bottom: 10px;
-  background: #fff4f7;
-  color: #d85c8d;
-  border: 1px solid #f3c3d3;
-  font-weight: bold;
-  text-align: left;
-}
-
-.tag-clear-btn:hover {
-  background: #ffeaf1;
-}
-
-.tag-group {
-  margin-bottom: 12px;
-}
-
-.tag-group-title {
-  font-size: 13px;
-  font-weight: bold;
-  color: #d85c8d;
-  padding: 4px 8px;
-  margin-bottom: 4px;
-}
-
-.tag-group-items {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-input[type="file"] {
-  color: #999;
-}
-
-input[type="file"]::file-selector-button {
-  color: #999;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-input[type="file"]::-webkit-file-upload-button {
-  color: #999;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-right: 10px;
-  cursor: pointer;
-}    
-    
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>
-      ⭐️🌸🧸🌿<br>
+    <header class="hero">
+      <h1>
+        ⭐️🌸🧸🌿<br>
         <span class="title-text">MY RECIPES</span><br>
-      ⭐️🌸🧸🌿
-    </h1>
+        ⭐️🌸🧸🌿
+      </h1>
+      <div class="stats" id="recipeStats">0 gespeichert</div>
+    </header>
 
-    <div class="card">
-      <h2>New Recipe</h2>
-     <input type="text" id="name" placeholder="Name" />
-<input type="text" id="tags" placeholder="Tags" />
+    <nav class="page-nav">
+      <button class="nav-button active" id="nav-new" onclick="showPage('new')">New Recipe</button>
+      <button class="nav-button" id="nav-all" onclick="showPage('all')">All Recipes</button>
+      <button class="nav-button" id="nav-search" onclick="showPage('search')">Search</button>
+    </nav>
 
-<select id="status" required>
-  <option value="" disabled selected hidden>Status</option>
-  <option value="tested">Tested</option>
-  <option value="new">New</option>
-</select>
+    <section id="page-new" class="page active">
+      <div class="card">
+        <h2>New Recipe</h2>
+        <input type="text" id="name" placeholder="Name" />
+        <input type="text" id="tags" placeholder="Tags, z. B. Pasta, Einfach, Vegetarisch" />
+        <textarea id="ingredients" placeholder="What"></textarea>
+        <textarea id="instructions" placeholder="How"></textarea>
+        <button onclick="saveRecipe()">Save ⭐️</button>
+      </div>
+    </section>
 
-<input type="file" id="image" accept="image/*" />
-<textarea id="ingredients" placeholder="What"></textarea>
-<textarea id="instructions" placeholder="How"></textarea>
-<button onclick="saveRecipe()">Save ⭐️</button>
-</div>
-    <div class="card">
-      <h2>Search</h2>
-     <input type="text" id="searchTitle" placeholder="Title" oninput="renderRecipes()" />
-<div class="tag-filter-wrap">
-  <input type="text" id="searchTags" placeholder="Tags" readonly />
-  <div id="tagDropdown" class="tag-dropdown hidden">
-    <input type="text" id="tagDropdownSearch" placeholder="Search tags" />
-    <button type="button" id="clearTagSelection" class="tag-clear-btn">Clear all selections</button>
-    <div id="tagOptions" class="tag-options"></div>
-  </div>
-</div>
-<input type="text" id="searchIngredients" placeholder="Ingredients" oninput="renderRecipes()" />
+    <section id="page-all" class="page">
+      <div class="section-head">
+        <h2>All Recipes</h2>
+        <span class="small" id="allCount"></span>
+      </div>
 
-<select id="searchStatus" onchange="renderRecipes()">
-  <option value="tested" selected>Tested</option>
-  <option value="new">New</option>
-  <option value="all">All</option>
-</select>
-    </div>
+      <div id="recipeListAll" class="recipe-grid"></div>
+    </section>
 
-    <div class="card">
-      <h2>My Recipes</h2>
-      <div id="recipeList"></div>
-    </div>
+    <section id="page-search" class="page">
+      <div class="card">
+        <h2>Search</h2>
+        <input type="text" id="searchTitle" placeholder="Title ..." oninput="renderRecipes()" />
+        <input type="text" id="searchTags" placeholder="Tags ..." oninput="renderRecipes()" />
+        <input type="text" id="searchIngredients" placeholder="Ingredients ..." oninput="renderRecipes()" />
+      </div>
+
+      <div class="section-head">
+        <h2>Search Results</h2>
+        <span class="small" id="searchCount"></span>
+      </div>
+
+      <div id="recipeListSearch" class="recipe-grid"></div>
+    </section>
   </div>
 
   <script type="module">
@@ -398,254 +342,129 @@ input[type="file"]::-webkit-file-upload-button {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-   let recipes = [];
-let editId = null;
-let selectedSearchTags = [];
+    let recipes = [];
+    let editId = null;
 
-const TAG_GROUPS = {
-  "Main ingredient": ["Meat", "Chicken", "Fish", "Vegetarian", "Sweet"],
-  "Sides": ["Pasta", "Potatoes", "Quinoa", "Rice", "Wraps"],
-  "Difficulty": ["Easy", "Medium", "Hard"]
-};
-
-const MAIN_TAG_ORDER = ["Meat", "Chicken", "Fish", "Vegetarian", "Sweet"];
-const DIFFICULTY_TAG_ORDER = ["Easy", "Medium", "Hard"];
-
-   async function uploadImage(file) {
-  if (!file) return null;
-
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-  const filePath = `recipes/${fileName}`;
-
-  const { error } = await supabase.storage
-    .from("recipe-images")
-    .upload(filePath, file);
-
-if (error) {
-  console.error("UPLOAD ERROR:", error);
-  alert("Upload Fehler: " + error.message);
-  return null;
-}
-
-  const { data } = supabase.storage
-    .from("recipe-images")
-    .getPublicUrl(filePath);
-
-  return data.publicUrl;
-}
-
-function linkify(text) {
-  if (!text) return "";
-  return text
-    .replace(
-      /(https?:\/\/[^\s<]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
-    )
-    .replace(/\n/g, "<br>");
-}
-
-function parseTags(tagsString) {
-  if (!tagsString) return [];
-
-  return tagsString
-    .split(/[;,]/)
-    .map(tag => tag.trim())
-    .filter(tag => tag.length > 0);
-}
-    function sortTags(tagsArray) {
-  if (!tagsArray || !tagsArray.length) return [];
-
-  const normalizedMainTags = new Map(
-    MAIN_TAG_ORDER.map(tag => [tag.toLowerCase(), tag])
-  );
-
-  const normalizedDifficultyTags = new Map(
-    DIFFICULTY_TAG_ORDER.map(tag => [tag.toLowerCase(), tag])
-  );
-
-  const seen = new Set();
-  const cleanedTags = tagsArray
-    .map(tag => tag.trim())
-    .filter(tag => tag.length > 0)
-    .filter(tag => {
-      const key = tag.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-  const mainTags = [];
-  const otherTags = [];
-  const difficultyTags = [];
-
-  cleanedTags.forEach(tag => {
-    const lowerTag = tag.toLowerCase();
-
-    if (normalizedMainTags.has(lowerTag)) {
-      mainTags.push(normalizedMainTags.get(lowerTag));
-    } else if (normalizedDifficultyTags.has(lowerTag)) {
-      difficultyTags.push(normalizedDifficultyTags.get(lowerTag));
-    } else {
-      otherTags.push(tag);
+    function escapeHtml(text) {
+      return String(text || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
-  });
 
-  mainTags.sort((a, b) => MAIN_TAG_ORDER.indexOf(a) - MAIN_TAG_ORDER.indexOf(b));
+    function linkify(text) {
+      if (!text) return "";
 
-  otherTags.sort((a, b) =>
-    a.localeCompare(b, "de", { sensitivity: "base" })
-  );
+      const safeText = escapeHtml(text);
 
-  difficultyTags.sort((a, b) =>
-    DIFFICULTY_TAG_ORDER.indexOf(a) - DIFFICULTY_TAG_ORDER.indexOf(b)
-  );
-
-  return [...mainTags, ...otherTags, ...difficultyTags];
-}
-  
-function getAllTags() {
-  const tagSet = new Set();
-
-  recipes.forEach(recipe => {
-    parseTags(recipe.tags).forEach(tag => tagSet.add(tag));
-  });
-
-  return [...tagSet].sort((a, b) => a.localeCompare(b, "de", { sensitivity: "base" }));
-}
-
-function syncSearchTagsInput() {
-  const input = document.getElementById("searchTags");
-  input.value = selectedSearchTags.join(", ");
-  renderRecipes();
-}
-
-function renderTagDropdown(filterText = "") {
-  const tagOptions = document.getElementById("tagOptions");
-  const allTags = getAllTags();
-  const filter = filterText.toLowerCase();
-
-  let html = "";
-  let hasVisibleTags = false;
-
-  Object.entries(TAG_GROUPS).forEach(([groupName, groupTags]) => {
-    const availableTags = groupTags.filter(groupTag =>
-      allTags.some(existingTag => existingTag.toLowerCase() === groupTag.toLowerCase())
-    );
-
-    const filteredGroupTags = availableTags.filter(tag =>
-    tag.toLowerCase().startsWith(filter)
-    );
-
-    if (filteredGroupTags.length > 0) {
-      hasVisibleTags = true;
-
-      html += `
-        <div class="tag-group">
-          <div class="tag-group-title">${groupName}</div>
-          <div class="tag-group-items">
-            ${filteredGroupTags.map(tag => {
-              const checked = selectedSearchTags.includes(tag) ? "checked" : "";
-              return `
-                <label class="tag-option">
-                  <input type="checkbox" value="${tag}" ${checked}>
-                  <span>${tag}</span>
-                </label>
-              `;
-            }).join("")}
-          </div>
-        </div>
-      `;
+      return safeText
+        .replace(
+          /(https?:\/\/[^\s<]+)/g,
+          '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+        )
+        .replace(/\n/g, "<br>");
     }
-  });
 
-  const groupedTagsFlat = Object.values(TAG_GROUPS).flat().map(tag => tag.toLowerCase());
+    function shortText(text, maxLength = 120) {
+      const clean = String(text || "").replace(/\s+/g, " ").trim();
 
- const otherTags = allTags.filter(tag =>
-  !groupedTagsFlat.includes(tag.toLowerCase()) &&
-  tag.toLowerCase().startsWith(filter)
-);
-
-  if (otherTags.length > 0) {
-    hasVisibleTags = true;
-
-    html += `
-      <div class="tag-group">
-        <div class="tag-group-title">Other tags</div>
-        <div class="tag-group-items">
-          ${otherTags.map(tag => {
-            const checked = selectedSearchTags.includes(tag) ? "checked" : "";
-            return `
-              <label class="tag-option">
-                <input type="checkbox" value="${tag}" ${checked}>
-                <span>${tag}</span>
-              </label>
-            `;
-          }).join("")}
-        </div>
-      </div>
-    `;
-  }
-
-  if (!hasVisibleTags) {
-    tagOptions.innerHTML = `<div class="tag-option empty">No tags found.</div>`;
-    return;
-  }
-
-  tagOptions.innerHTML = html;
-
-  tagOptions.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener("change", (e) => {
-      const tag = e.target.value;
-
-      if (e.target.checked) {
-        if (!selectedSearchTags.includes(tag)) {
-          selectedSearchTags.push(tag);
-        }
-      } else {
-        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
+      if (clean.length <= maxLength) {
+        return escapeHtml(clean);
       }
 
-     selectedSearchTags = sortTags(selectedSearchTags);
-      syncSearchTagsInput();
-      renderTagDropdown(document.getElementById("tagDropdownSearch").value);
-    });
-  });
-}
-
-function setupTagDropdown() {
-  const searchTagsInput = document.getElementById("searchTags");
-  const tagDropdown = document.getElementById("tagDropdown");
-  const tagDropdownSearch = document.getElementById("tagDropdownSearch");
-  const clearTagSelection = document.getElementById("clearTagSelection");
-
-  searchTagsInput.addEventListener("focus", () => {
-    tagDropdown.classList.remove("hidden");
-    tagDropdownSearch.value = "";
-    renderTagDropdown("");
-  });
-
-  searchTagsInput.addEventListener("click", () => {
-    tagDropdown.classList.remove("hidden");
-    tagDropdownSearch.value = "";
-    renderTagDropdown("");
-  });
-
-  tagDropdownSearch.addEventListener("input", (e) => {
-    renderTagDropdown(e.target.value);
-  });
-  clearTagSelection.addEventListener("click", () => {
-    selectedSearchTags = [];
-    tagDropdownSearch.value = "";
-    syncSearchTagsInput();
-    renderTagDropdown("");
-  });
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".tag-filter-wrap")) {
-      tagDropdown.classList.add("hidden");
+      return escapeHtml(clean.slice(0, maxLength)) + "...";
     }
-  });
-}
+
+    function renderTagChips(tags) {
+      const tagArray = String(tags || "")
+        .split(/[;,]/)
+        .map(tag => tag.trim())
+        .filter(Boolean);
+
+      if (tagArray.length === 0) {
+        return '<span class="tag-chip">Ohne Tags</span>';
+      }
+
+      return tagArray
+        .map(tag => `<span class="tag-chip">${escapeHtml(tag)}</span>`)
+        .join("");
+    }
+
+    function createRecipeCard(recipe, area) {
+      return `
+        <article class="recipe-tile">
+          <div class="recipe-tile-header">
+            <p class="small label">Rezept</p>
+            <h3>${escapeHtml(recipe.title || "Ohne Titel")}</h3>
+          </div>
+
+          <div class="recipe-tile-body">
+            <div class="tag-row">
+              ${renderTagChips(recipe.tags)}
+            </div>
+
+            <p class="recipe-preview">
+              ${shortText(recipe.ingredients || "Keine Zutaten eingetragen.")}
+            </p>
+
+            <button class="primary-btn" onclick="toggleDetails(${recipe.id}, '${area}')">
+              Details ansehen
+            </button>
+
+            <div id="details-${area}-${recipe.id}" class="recipe-details hidden">
+              <h4>Zutaten</h4>
+              <p class="content-text">${linkify(recipe.ingredients || "")}</p>
+
+              <h4>Zubereitung</h4>
+              <p class="content-text">${linkify(recipe.instructions || "")}</p>
+
+              <div class="actions">
+                <button class="secondary-btn" onclick="editRecipe(${recipe.id})">Bearbeiten</button>
+                <button class="secondary-btn" onclick="deleteRecipe(${recipe.id})">Löschen</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderRecipeGrid(element, recipeArray, area, emptyText) {
+      element.innerHTML = "";
+
+      if (recipeArray.length === 0) {
+        element.innerHTML = `<div class="empty-state">${emptyText}</div>`;
+        return;
+      }
+
+      element.innerHTML = recipeArray
+        .map(recipe => createRecipeCard(recipe, area))
+        .join("");
+    }
+
+    window.toggleDetails = function (id, area) {
+      const details = document.getElementById(`details-${area}-${id}`);
+
+      if (!details) {
+        return;
+      }
+
+      details.classList.toggle("hidden");
+    };
+
+    window.showPage = function (pageName) {
+      document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+      });
+
+      document.querySelectorAll(".nav-button").forEach(button => {
+        button.classList.remove("active");
+      });
+
+      document.getElementById(`page-${pageName}`).classList.add("active");
+      document.getElementById(`nav-${pageName}`).classList.add("active");
+    };
 
     async function loadRecipes() {
       const { data, error } = await supabase
@@ -653,170 +472,129 @@ function setupTagDropdown() {
         .select("*")
         .order("created_at", { ascending: false });
 
-  if (error) {
-  console.error("LOAD ERROR:", error);
-  alert("DB Fehler beim Laden: " + error.message);
-  return;
-}
+      if (error) {
+        console.error("Fehler beim Laden:", error);
+        alert("Rezepte konnten nicht geladen werden.");
+        return;
+      }
 
       recipes = data || [];
-renderRecipes();
-renderTagDropdown("");
+      renderRecipes();
     }
 
     window.saveRecipe = async function () {
       const title = document.getElementById("name").value.trim();
-     const rawTags = document.getElementById("tags").value.trim();
-      const tags = sortTags(parseTags(rawTags)).join(", ");
-      const status = document.getElementById("status").value;
+      const tags = document.getElementById("tags").value.trim();
       const ingredients = document.getElementById("ingredients").value.trim();
       const instructions = document.getElementById("instructions").value.trim();
-      const imageFile = document.getElementById("image").files[0];
 
-     if (!title || !ingredients || !instructions) {
-  alert("Bitte mindestens Name, Zutaten und Zubereitung ausfüllen.");
-  return;
-}
-
-let image_url = null;
-
-if (editId !== null) {
-  const existingRecipe = recipes.find(r => r.id === editId);
-  image_url = existingRecipe?.image_url || null;
-}
-
-if (imageFile) {
-  image_url = await uploadImage(imageFile);
-  if (!image_url) return;
-}
+      if (!title || !ingredients || !instructions) {
+        alert("Bitte mindestens Name, Zutaten und Zubereitung ausfüllen.");
+        return;
+      }
 
       if (editId === null) {
-       const { error } = await supabase.from("recipes").insert([
-      { title, tags, status, ingredients, instructions, image_url }
-    ]);
+        const { error } = await supabase.from("recipes").insert([
+          { title, tags, ingredients, instructions }
+        ]);
 
- if (error) {
-  console.error(error);
-  alert("DB Fehler: " + error.message);
-  return;
-}
-        
+        if (error) {
+          console.error("Fehler beim Speichern:", error);
+          alert("Rezept konnte nicht gespeichert werden.");
+          return;
+        }
       } else {
         const { error } = await supabase
           .from("recipes")
-       .update({ title, tags, status, ingredients, instructions, image_url })
+          .update({ title, tags, ingredients, instructions })
           .eq("id", editId);
 
-       if (error) {
-  console.error("UPDATE ERROR:", error);
-  alert("DB Fehler beim Aktualisieren: " + error.message);
-  return;
-}
+        if (error) {
+          console.error("Fehler beim Aktualisieren:", error);
+          alert("Rezept konnte nicht aktualisiert werden.");
+          return;
+        }
 
         editId = null;
       }
 
       document.getElementById("name").value = "";
       document.getElementById("tags").value = "";
-      document.getElementById("status").value = "tested";
-      document.getElementById("image").value = "";
       document.getElementById("ingredients").value = "";
       document.getElementById("instructions").value = "";
 
       await loadRecipes();
+      showPage("all");
     };
 
     window.renderRecipes = function () {
-      const list = document.getElementById("recipeList");
+      const allList = document.getElementById("recipeListAll");
+      const searchList = document.getElementById("recipeListSearch");
+
       const searchTitle = document.getElementById("searchTitle").value.toLowerCase();
-     const searchTags = selectedSearchTags.map(tag => tag.toLowerCase());
+      const searchTags = document.getElementById("searchTags").value.toLowerCase();
       const searchIngredients = document.getElementById("searchIngredients").value.toLowerCase();
-      const searchStatus = document.getElementById("searchStatus").value;
 
-      list.innerHTML = "";
+      const filteredRecipes = recipes.filter(recipe => {
+        const titleMatch = (recipe.title || "").toLowerCase().includes(searchTitle);
 
-const filteredRecipes = recipes.filter(recipe => {
-  const titleMatch = (recipe.title || "").toLowerCase().includes(searchTitle);
+        const recipeTags = (recipe.tags || "")
+          .toLowerCase()
+          .split(/[;,]/)
+          .map(t => t.trim())
+          .filter(t => t);
 
- const recipeTags = parseTags(recipe.tags).map(tag => tag.toLowerCase());
-const searchTagsArray = searchTags;
+        const searchTagsArray = searchTags
+          .toLowerCase()
+          .split(/[;,]/)
+          .map(t => t.trim())
+          .filter(t => t);
 
-const tagsMatch =
-  searchTagsArray.length === 0 ||
-  searchTagsArray.every(searchTag => recipeTags.includes(searchTag));
+        const tagsMatch =
+          searchTagsArray.length === 0 ||
+          searchTagsArray.every(searchTag =>
+            recipeTags.some(recipeTag => recipeTag.includes(searchTag))
+          );
 
-  const ingredientsText = (recipe.ingredients || "").toLowerCase();
+        const ingredientsText = (recipe.ingredients || "").toLowerCase();
 
-  const searchIngredientsArray = searchIngredients
-    .toLowerCase()
-    .split(/[,\n;]/)
-    .map(i => i.trim())
-    .filter(i => i);
+        const searchIngredientsArray = searchIngredients
+          .toLowerCase()
+          .split(/[,\n;]/)
+          .map(i => i.trim())
+          .filter(i => i);
 
-  const ingredientsMatch =
-    searchIngredientsArray.length === 0 ||
-    searchIngredientsArray.every(searchIngredient =>
-      ingredientsText.includes(searchIngredient)
-    );
+        const ingredientsMatch =
+          searchIngredientsArray.length === 0 ||
+          searchIngredientsArray.every(searchIngredient =>
+            ingredientsText.includes(searchIngredient)
+          );
 
-const recipeStatus = (recipe.status || "tested").toLowerCase();
-
-const statusMatch =
-  searchStatus === "all" || recipeStatus === searchStatus;
-
-return titleMatch && tagsMatch && ingredientsMatch && statusMatch;
-});
-
-      if (filteredRecipes.length === 0) {
-        list.innerHTML = "<p>Keine Rezepte gefunden.</p>";
-        return;
-      }
-
-      filteredRecipes.forEach((recipe) => {
-        const div = document.createElement("div");
-        div.className = "recipe";
-        const recipeStatus = (recipe.status || "tested").toLowerCase();
-const statusLabel = recipeStatus === "new" ? "New" : "Tested";
-const statusClass = recipeStatus === "new" ? "status-new" : "status-tested";
-
-div.innerHTML = `
-  <div class="recipe-title-row">
-    <h3>${recipe.title}</h3>
-    <span class="status-pill ${statusClass}">${statusLabel}</span>
-  </div>
-  ${recipe.image_url ? `<img src="${recipe.image_url}" alt="${recipe.title}" class="recipe-image">` : ""}
-  <div class="tags">
-    <span class="tags-label">Tags:</span>
-    <div class="tags-list">
-      ${
-        sortTags(parseTags(recipe.tags)).length
-          ? sortTags(parseTags(recipe.tags)).map(tag => `<span class="tag-pill">${tag}</span>`).join("")
-          : `<span>-</span>`
-      }
-    </div>
-  </div>
-
-  <button
-    type="button"
-    class="toggle-details-btn"
-    id="toggle-details-btn-${recipe.id}"
-    onclick="toggleRecipeDetails(${recipe.id})"
-  >
-    Show details
-  </button>
-
-  <div class="recipe-details" id="recipe-details-${recipe.id}">
-    <p class="content-text"><strong>Zutaten:</strong><br>${linkify(recipe.ingredients || "")}</p>
-    <p class="content-text"><strong>Zubereitung:</strong><br>${linkify(recipe.instructions || "")}</p>
-  </div>
-
-  <div class="actions">
-    <button onclick="editRecipe(${recipe.id})">Edit</button>
-    <button onclick="deleteRecipe(${recipe.id})">Delete</button>
-  </div>
-`;
-        list.appendChild(div);
+        return titleMatch && tagsMatch && ingredientsMatch;
       });
+
+      document.getElementById("recipeStats").textContent =
+        `${recipes.length} gespeichert`;
+
+      document.getElementById("allCount").textContent =
+        `${recipes.length} Rezepte`;
+
+      document.getElementById("searchCount").textContent =
+        `${filteredRecipes.length} Treffer`;
+
+      renderRecipeGrid(
+        allList,
+        recipes,
+        "all",
+        "Noch keine Rezepte gespeichert."
+      );
+
+      renderRecipeGrid(
+        searchList,
+        filteredRecipes,
+        "search",
+        "Keine Rezepte gefunden."
+      );
     };
 
     window.deleteRecipe = async function (id) {
@@ -836,40 +614,24 @@ div.innerHTML = `
       await loadRecipes();
     };
 
-    window.toggleRecipeDetails = function (id) {
-  const details = document.getElementById(`recipe-details-${id}`);
-  const button = document.getElementById(`toggle-details-btn-${id}`);
-
-  if (!details || !button) return;
-
-  const isOpen = details.classList.contains("open");
-
-  if (isOpen) {
-    details.classList.remove("open");
-    button.textContent = "Show details";
-  } else {
-    details.classList.add("open");
-    button.textContent = "Hide details";
-  }
-};
-    
     window.editRecipe = function (id) {
-  const recipe = recipes.find(r => r.id === id);
-  if (!recipe) return;
+      const recipe = recipes.find(r => r.id === id);
 
-  document.getElementById("name").value = recipe.title || "";
-  document.getElementById("tags").value = recipe.tags || "";
-  document.getElementById("status").value = recipe.status || "tested";
-  document.getElementById("image").value = "";
-  document.getElementById("ingredients").value = recipe.ingredients || "";
-  document.getElementById("instructions").value = recipe.instructions || "";
+      if (!recipe) {
+        return;
+      }
 
-  editId = id;
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
+      document.getElementById("name").value = recipe.title || "";
+      document.getElementById("tags").value = recipe.tags || "";
+      document.getElementById("ingredients").value = recipe.ingredients || "";
+      document.getElementById("instructions").value = recipe.instructions || "";
 
-   setupTagDropdown();
-loadRecipes();
+      editId = id;
+      showPage("new");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    loadRecipes();
   </script>
 </body>
 </html>
